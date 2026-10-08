@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedNotes - Music Note Trainer</title>
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            transition: background 0.5s ease;
+        }
+
+        body.theme-purple {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+
+        body.theme-blue {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3a7bd5 100%);
+        }
+
+        body.theme-green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 50%, #56ab2f 100%);
+        }
+
+        body.theme-orange {
+            background: linear-gradient(135deg, #f12711 0%, #f5af19 50%, #ff6b6b 100%);
+        }
+
+        body.theme-pink {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+        }
+
+        body.theme-sunset {
+            background: linear-gradient(135deg, #ff512f 0%, #dd2476 50%, #ff9a8b 100%);
+        }
+
+        body.theme-ocean {
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 50%, #00d2ff 100%);
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover, button:hover {
+            border-color: #667eea;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .staff-container {
+            background: #fff;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #staff {
+            width: 100%;
+            height: 200px;
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .feedback.neutral {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-box .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-box .value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .note-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .note-button {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #ddd;
+            padding: 12px 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .note-button:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .note-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+        }
+
+        .close-btn {
+            background: #dc3545;
+            width: auto;
+            padding: 8px 15px;
+        }
+
+        .close-btn:hover {
+            background: #c82333;
+        }
+
+        .key-assignment-list {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .key-assignment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .key-assignment-item:hover {
+            background: #e9ecef;
+        }
+
+        .key-assignment-item.listening {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+        }
+
+        .key-assignment-item .note-name {
+            font-weight: 600;
+        }
+
+        .key-assignment-item .key-name {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+
+        .key-assignment-item .unassigned {
+            background: #6c757d;
+        }
+
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .secondary-btn {
+            background: #6c757d;
+        }
+
+        .secondary-btn:hover {
+            background: #5a6268;
+        }
+
+        /* Conflict Modal */
+        .conflict-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .conflict-modal.active {
+            display: flex;
+        }
+
+        .conflict-message {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .conflict-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .confirm-btn {
+            background: #28a745;
+        }
+
+        .confirm-btn:hover {
+            background: #218838;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+
+        /* Footer Styles */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #333;
+            font-size: 1.2em;
+            font-weight: 600;
+            animation: slideDown 1s ease-out;
+        }
+
+        .creator {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 30px;
+            border-radius: 25px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s ease-in-out infinite;
+            white-space: nowrap;
+            min-width: 200px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 SpeedNotes</h1>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="language-select">Language / Idioma</label>
+                <select id="language-select">
+                    <option value="es" selected>Español</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="clef-select" data-i18n="clef">Clave</label>
+                <select id="clef-select">
+                    <option value="treble" data-i18n="treble">Clave de Sol (2ª línea)</option>
+                    <option value="bass" data-i18n="bass">Clave de Fa (4ª línea)</option>
+                    <option value="bass-3" data-i18n="bass-3">Clave de Fa (3ª línea)</option>
+                    <option value="soprano" data-i18n="soprano">Clave de Do (Soprano - 1ª línea)</option>
+                    <option value="mezzo-soprano" data-i18n="mezzo-soprano">Clave de Do (Mezzosoprano - 2ª línea)</option>
+                    <option value="alto" data-i18n="alto">Clave de Do (Alto - 3ª línea)</option>
+                    <option value="tenor" data-i18n="tenor">Clave de Do (Tenor - 4ª línea)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="mode-select" data-i18n="practice-mode">Modo de práctica</label>
+                <select id="mode-select">
+                    <option value="lines" data-i18n="lines-only">Solo líneas</option>
+                    <option value="spaces" data-i18n="spaces-only">Solo espacios</option>
+                    <option value="mixed" selected data-i18n="mixed">Mezcla</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="upper-ledger" data-i18n="upper-ledger">Líneas adicionales arriba</label>
+                <select id="upper-ledger">
+                    <option value="0" selected>0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="lower-ledger" data-i18n="lower-ledger">Líneas adicionales abajo</label>
+                <select id="lower-ledger">
+                    <option value="0" selected>0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="consolidate-notes">
+                    <input type="checkbox" id="consolidate-notes" style="width: auto; margin-right: 10px;">
+                    <span data-i18n="consolidate-notes">Consolidar notas por nombre</span>
+                </label>
+                <small style="color: #666; display: block; margin-top: 5px;" data-i18n="consolidate-notes-desc">
+                    Un solo botón "Do" para todas las notas Do
+                </small>
+            </div>
+
+            <div class="control-group">
+                <label for="gradient-select" data-i18n="background-theme">Tema de fondo</label>
+                <select id="gradient-select">
+                    <option value="purple" selected data-i18n="purple">Púrpura (original)</option>
+                    <option value="blue" data-i18n="blue">Azul</option>
+                    <option value="green" data-i18n="green">Verde</option>
+                    <option value="orange" data-i18n="orange">Naranja</option>
+                    <option value="pink" data-i18n="pink">Rosa</option>
+                    <option value="sunset" data-i18n="sunset">Atardecer</option>
+                    <option value="ocean" data-i18n="ocean">Océano</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="staff-container">
+            <div id="staff"></div>
+        </div>
+
+        <div class="feedback neutral" id="feedback" data-i18n="press-key">
+            Pulsa una tecla o botón para comenzar
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="label" data-i18n="correct">Aciertos</div>
+                <div class="value" id="correct-count">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="label" data-i18n="wrong">Fallos</div>
+                <div class="value" id="wrong-count">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="label" data-i18n="percentage">Porcentaje</div>
+                <div class="value" id="percentage">0%</div>
+            </div>
+            <div class="stat-box">
+                <div class="label" data-i18n="streak">Racha</div>
+                <div class="value" id="streak">0</div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button id="config-keys-btn" data-i18n="configure-keys">⌨️ Configurar teclas</button>
+            <button id="reset-btn" data-i18n="reset-session">🔄 Reiniciar sesión</button>
+        </div>
+
+        <div class="note-buttons" id="note-buttons"></div>
+
+        <div class="footer">
+            <div class="creator" data-i18n="created-by">Creado por not_alviii 🧸</div>
+        </div>
+    </div>
+
+    <!-- Key Configuration Modal -->
+    <div class="modal" id="key-config-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-i18n="configure-keys-modal">Configurar Teclas</h2>
+                <button class="close-btn" id="close-modal">✕</button>
+            </div>
+            <p style="margin-bottom: 15px; color: #666;" data-i18n="click-note">Haz clic en una nota para reasignar su tecla.</p>
+            <div class="key-assignment-list" id="key-assignment-list"></div>
+            <div class="modal-actions">
+                <button class="secondary-btn" id="restore-defaults" data-i18n="restore-defaults">Restaurar por defecto</button>
+                <button id="close-modal-btn" data-i18n="close">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conflict Resolution Modal -->
+    <div class="conflict-modal" id="conflict-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-i18n="key-conflict">Conflicto de Tecla</h2>
+            </div>
+            <p class="conflict-message" id="conflict-message"></p>
+            <div class="conflict-actions">
+                <button class="secondary-btn" id="cancel-conflict" data-i18n="cancel">Cancelar</button>
+                <button class="confirm-btn" id="confirm-swap" data-i18n="swap">Intercambiar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // SISTEMA DE TRADUCCIONES
+        // ============================================
+        const translations = {
+            es: {
+                'clef': 'Clave',
+                'treble': 'Clave de Sol (2ª línea)',
+                'bass': 'Clave de Fa (4ª línea)',
+                'bass-3': 'Clave de Fa (3ª línea)',
+                'soprano': 'Clave de Do (Soprano - 1ª línea)',
+                'mezzo-soprano': 'Clave de Do (Mezzosoprano - 2ª línea)',
+                'alto': 'Clave de Do (Alto - 3ª línea)',
+                'tenor': 'Clave de Do (Tenor - 4ª línea)',
+                'practice-mode': 'Modo de práctica',
+                'lines-only': 'Solo líneas',
+                'spaces-only': 'Solo espacios',
+                'mixed': 'Mezcla',
+                'upper-ledger': 'Líneas adicionales arriba',
+                'lower-ledger': 'Líneas adicionales abajo',
+                'consolidate-notes': 'Consolidar notas por nombre',
+                'consolidate-notes-desc': 'Un solo botón "Do" para todas las notas Do',
+                'background-theme': 'Tema de fondo',
+                'purple': 'Púrpura (original)',
+                'blue': 'Azul',
+                'green': 'Verde',
+                'orange': 'Naranja',
+                'pink': 'Rosa',
+                'sunset': 'Atardecer',
+                'ocean': 'Océano',
+                'press-key': 'Pulsa una tecla o botón para comenzar',
+                'correct': 'Aciertos',
+                'wrong': 'Fallos',
+                'percentage': 'Porcentaje',
+                'streak': 'Racha',
+                'configure-keys': '⌨️ Configurar teclas',
+                'reset-session': '🔄 Reiniciar sesión',
+                'created-by': 'Creado por not_alviii 🧸',
+                'configure-keys-modal': 'Configurar Teclas',
+                'click-note': 'Haz clic en una nota para reasignar su tecla.',
+                'restore-defaults': 'Restaurar por defecto',
+                'close': 'Cerrar',
+                'key-conflict': 'Conflicto de Tecla',
+                'cancel': 'Cancelar',
+                'swap': 'Intercambiar',
+                'correct-feedback': '¡Correcto! ✓',
+                'wrong-feedback': 'Era'
+            },
+            en: {
+                'clef': 'Clef',
+                'treble': 'Treble Clef (2nd line)',
+                'bass': 'Bass Clef (4th line)',
+                'bass-3': 'Bass Clef (3rd line)',
+                'soprano': 'C Clef (Soprano - 1st line)',
+                'mezzo-soprano': 'C Clef (Mezzosoprano - 2nd line)',
+                'alto': 'C Clef (Alto - 3rd line)',
+                'tenor': 'C Clef (Tenor - 4th line)',
+                'practice-mode': 'Practice Mode',
+                'lines-only': 'Lines Only',
+                'spaces-only': 'Spaces Only',
+                'mixed': 'Mixed',
+                'upper-ledger': 'Upper Ledger Lines',
+                'lower-ledger': 'Lower Ledger Lines',
+                'consolidate-notes': 'Consolidate notes by name',
+                'consolidate-notes-desc': 'Single "Do" button for all Do notes',
+                'background-theme': 'Background Theme',
+                'purple': 'Purple (original)',
+                'blue': 'Blue',
+                'green': 'Green',
+                'orange': 'Orange',
+                'pink': 'Pink',
+                'sunset': 'Sunset',
+                'ocean': 'Ocean',
+                'press-key': 'Press a key or button to start',
+                'correct': 'Correct',
+                'wrong': 'Wrong',
+                'percentage': 'Percentage',
+                'streak': 'Streak',
+                'configure-keys': '⌨️ Configure Keys',
+                'reset-session': '🔄 Reset Session',
+                'created-by': 'Created by not_alviii 🧸',
+                'configure-keys-modal': 'Configure Keys',
+                'click-note': 'Click on a note to reassign its key.',
+                'restore-defaults': 'Restore Defaults',
+                'close': 'Close',
+                'key-conflict': 'Key Conflict',
+                'cancel': 'Cancel',
+                'swap': 'Swap',
+                'correct-feedback': 'Correct! ✓',
+                'wrong-feedback': 'It was'
+            }
+        };
+
+        let currentLanguage = 'es';
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            localStorage.setItem('speedNotesLanguage', lang);
+        }
+
+        // ============================================
+        // REPRESENTACIÓN INTERNA DE LAS NOTAS
+        // ============================================
+        // Posición diatónica: varía según la clave
+        // Para clave de sol: E4 = 0 (línea inferior del pentagrama)
+        // Posiciones pares = líneas, impares = espacios
+        const NOTES = [
+            { id: 'C0', name: 'Do', octave: 0, displayName: 'Do', position: -31 },
+            { id: 'D0', name: 'Re', octave: 0, displayName: 'Re', position: -30 },
+            { id: 'E0', name: 'Mi', octave: 0, displayName: 'Mi', position: -29 },
+            { id: 'F0', name: 'Fa', octave: 0, displayName: 'Fa', position: -28 },
+            { id: 'G0', name: 'Sol', octave: 0, displayName: 'Sol', position: -27 },
+            { id: 'A0', name: 'La', octave: 0, displayName: 'La', position: -26 },
+            { id: 'B0', name: 'Si', octave: 0, displayName: 'Si', position: -25 },
+            { id: 'C1', name: 'Do', octave: 1, displayName: 'Do', position: -24 },
+            { id: 'D1', name: 'Re', octave: 1, displayName: 'Re', position: -23 },
+            { id: 'E1', name: 'Mi', octave: 1, displayName: 'Mi', position: -22 },
+            { id: 'F1', name: 'Fa', octave: 1, displayName: 'Fa', position: -21 },
+            { id: 'G1', name: 'Sol', octave: 1, displayName: 'Sol', position: -20 },
+            { id: 'A1', name: 'La', octave: 1, displayName: 'La', position: -19 },
+            { id: 'B1', name: 'Si', octave: 1, displayName: 'Si', position: -18 },
+            { id: 'C2', name: 'Do', octave: 2, displayName: 'Do', position: -17 },
+            { id: 'D2', name: 'Re', octave: 2, displayName: 'Re', position: -16 },
+            { id: 'E2', name: 'Mi', octave: 2, displayName: 'Mi', position: -15 },
+            { id: 'F2', name: 'Fa', octave: 2, displayName: 'Fa', position: -14 },
+            { id: 'G2', name: 'Sol', octave: 2, displayName: 'Sol', position: -13 },
+            { id: 'A2', name: 'La', octave: 2, displayName: 'La', position: -12 },
+            { id: 'B2', name: 'Si', octave: 2, displayName: 'Si', position: -11 },
+            { id: 'C3', name: 'Do', octave: 3, displayName: 'Do', position: -10 },
+            { id: 'D3', name: 'Re', octave: 3, displayName: 'Re', position: -9 },
+            { id: 'E3', name: 'Mi', octave: 3, displayName: 'Mi', position: -8 },
+            { id: 'F3', name: 'Fa', octave: 3, displayName: 'Fa', position: -7 },
+            { id: 'G3', name: 'Sol', octave: 3, displayName: 'Sol', position: -6 },
+            { id: 'A3', name: 'La', octave: 3, displayName: 'La', position: -5 },
+            { id: 'B3', name: 'Si', octave: 3, displayName: 'Si', position: -4 },
+            { id: 'C4', name: 'Do', octave: 4, displayName: 'Do', position: -3 },
+            { id: 'D4', name: 'Re', octave: 4, displayName: 'Re', position: -2 },
+            { id: 'E4', name: 'Mi', octave: 4, displayName: 'Mi', position: -1 },
+            { id: 'F4', name: 'Fa', octave: 4, displayName: 'Fa', position: 0 },
+            { id: 'G4', name: 'Sol', octave: 4, displayName: 'Sol', position: 1 },
+            { id: 'A4', name: 'La', octave: 4, displayName: 'La', position: 2 },
+            { id: 'B4', name: 'Si', octave: 4, displayName: 'Si', position: 3 },
+            { id: 'C5', name: 'Do', octave: 5, displayName: 'Do', position: 4 },
+            { id: 'D5', name: 'Re', octave: 5, displayName: 'Re', position: 5 },
+            { id: 'E5', name: 'Mi', octave: 5, displayName: 'Mi', position: 6 },
+            { id: 'F5', name: 'Fa', octave: 5, displayName: 'Fa', position: 7 },
+            { id: 'G5', name: 'Sol', octave: 5, displayName: 'Sol', position: 8 },
+            { id: 'A5', name: 'La', octave: 5, displayName: 'La', position: 9 },
+            { id: 'B5', name: 'Si', octave: 5, displayName: 'Si', position: 10 },
+            { id: 'C6', name: 'Do', octave: 6, displayName: 'Do', position: 11 }
+        ];
+
+        // Mapeo de teclas por defecto según solicitud
+        const DEFAULT_KEY_MAP = {
+            'G2': 'A',    // Sol 2º
+            'F3': 'S',    // Fa 3º
+            'F4': 'D',    // Fa 4º
+            'C1': 'F',    // Do 1º
+            'C2': 'G',    // Do 2º
+            'C3': 'H',    // Do 3º
+            'C4': 'J'     // Do 4º
+        };
+
+        // Mapeo de teclas por defecto para modo consolidado (por nombre de nota)
+        const DEFAULT_CONSOLIDATED_KEY_MAP = {
+            'Do': 'A',
+            'Re': 'S',
+            'Mi': 'D',
+            'Fa': 'F',
+            'Sol': 'G',
+            'La': 'H',
+            'Si': 'J'
+        };
+
+        // ============================================
+        // ESTADO CENTRALIZADO DE LA APLICACIÓN
+        // ============================================
+        const state = {
+            clef: 'treble',
+            mode: 'mixed',
+            upperLedgerLines: 0,
+            lowerLedgerLines: 0,
+            consolidateNotes: false,
+            currentNote: null,
+            previousNote: null,
+            correctAnswers: 0,
+            wrongAnswers: 0,
+            streak: 0,
+            isProcessingAnswer: false,
+            keyMap: {},
+            isConfiguringKey: false,
+            configuringNoteId: null,
+            pendingKey: null,
+            conflictNoteId: null
+        };
+
+        // ============================================
+        // FUNCIONES DE CÁLCULO DE NOTAS
+        // ============================================
+
+        /**
+         * Determina si una posición corresponde a una línea (impar) o espacio (par)
+         * Las posiciones impares son líneas, las pares son espacios
+         */
+        function isLinePosition(note) {
+            return note.position % 2 !== 0;
+        }
+
+        /**
+         * Calcula el rango de posiciones diatónicas basado en las líneas adicionales y la clave
+         * Clave de sol: E4 (posición -1) a F5 (posición 7)
+         * Clave de fa (4ª línea): G2 (posición -13) a A3 (posición -5)
+         * Clave de fa (3ª línea): Bb1 (posición -15) a C3 (posición -7)
+         * Clave de do alto (3ª línea): C4 (posición -3) a D5 (posición 5)
+         * Clave de do tenor (4ª línea): C4 (posición -3) a D5 (posición 5)
+         * Clave de do soprano (1ª línea): C4 (posición -3) a D5 (posición 5)
+         * Clave de do mezzosoprano (2ª línea): C4 (posición -3) a D5 (posición 5)
+         * Cada línea adicional arriba añade 2 posiciones
+         * Cada línea adicional abajo añade 2 posiciones
+         */
+        function getPositionRange() {
+            let baseMin, baseMax;
+            
+            switch (state.clef) {
+                case 'bass':
+                    baseMin = -13; // G2
+                    baseMax = -5; // A3
+                    break;
+                case 'bass-3':
+                    baseMin = -15; // Bb1
+                    baseMax = -7; // C3
+                    break;
+                case 'alto':
+                case 'tenor':
+                case 'soprano':
+                case 'mezzo-soprano':
+                    baseMin = -3; // C4
+                    baseMax = 5; // D5
+                    break;
+                case 'treble':
+                default:
+                    baseMin = -1; // E4
+                    baseMax = 7; // F5
+                    break;
+            }
+            
+            const min = baseMin - (state.lowerLedgerLines * 2);
+            const max = baseMax + (state.upperLedgerLines * 2);
+            
+            return { min, max };
+        }
+
+        /**
+         * Obtiene todas las notas disponibles dentro del rango actual
+         */
+        function getAvailableNotes() {
+            const { min, max } = getPositionRange();
+            return NOTES.filter(note => note.position >= min && note.position <= max);
+        }
+
+        /**
+         * Filtra las notas según el modo seleccionado
+         */
+        function getNotesForMode(notes) {
+            switch (state.mode) {
+                case 'lines':
+                    return notes.filter(note => isLinePosition(note));
+                case 'spaces':
+                    return notes.filter(note => !isLinePosition(note));
+                case 'mixed':
+                default:
+                    return notes;
+            }
+        }
+
+        /**
+         * Obtiene las notas activas actual (rango + modo)
+         */
+        function getActiveNotes() {
+            const availableNotes = getAvailableNotes();
+            return getNotesForMode(availableNotes);
+        }
+
+        /**
+         * Selecciona una nota aleatoria, evitando repetición inmediata
+         */
+        function getRandomNote() {
+            const activeNotes = getActiveNotes();
+            
+            if (activeNotes.length === 0) return null;
+            
+            if (activeNotes.length === 1) {
+                return activeNotes[0];
+            }
+            
+            // Filtrar para evitar repetición inmediata
+            const candidates = activeNotes.filter(note => 
+                !state.previousNote || note.id !== state.previousNote.id
+            );
+            
+            // Si por alguna razón solo queda una opción, usarla
+            const pool = candidates.length > 0 ? candidates : activeNotes;
+            const randomIndex = Math.floor(Math.random() * pool.length);
+            return pool[randomIndex];
+        }
+
+        /**
+         * Genera la siguiente nota
+         */
+        function generateNextNote() {
+            state.previousNote = state.currentNote;
+            state.currentNote = getRandomNote();
+            renderCurrentNote();
+            updateNoteButtons();
+            updateFeedback('neutral', '');
+        }
+
+        // ============================================
+        // FUNCIONES DE RENDERIZADO
+        // ============================================
+
+        /**
+         * Renderiza la nota actual usando VexFlow o fallback SVG
+         */
+        function renderCurrentNote() {
+            if (!state.currentNote) return;
+            
+            const note = state.currentNote;
+            
+            // Intentar usar VexFlow primero
+            if (typeof Vex !== 'undefined' && Vex.Flow) {
+                renderWithVexFlow(note);
+            } else {
+                renderWithSVG(note);
+            }
+        }
+
+        /**
+         * Renderiza usando VexFlow
+         */
+        function renderWithVexFlow(note) {
+            const staffDiv = document.getElementById('staff');
+            staffDiv.innerHTML = '';
+            
+            try {
+                const renderer = new Vex.Flow.Renderer(staffDiv, Vex.Flow.Renderer.Backends.SVG);
+                
+                // Configurar el renderer
+                renderer.resize(staffDiv.clientWidth, 200);
+                const context = renderer.getContext();
+                
+                // Crear el pentagrama con la clave seleccionada
+                const stave = new Vex.Flow.Stave(10, 40, staffDiv.clientWidth - 20);
+                
+                // Mapeo de claves para VexFlow
+                const vexClefMap = {
+                    'treble': 'treble',
+                    'bass': 'bass',
+                    'bass-3': 'bass', // VexFlow no tiene clave de fa en 3ª línea, usamos la normal y ajustamos
+                    'alto': 'alto',
+                    'tenor': 'tenor',
+                    'soprano': 'soprano',
+                    'mezzo-soprano': 'mezzo-soprano'
+                };
+                
+                stave.addClef(vexClefMap[state.clef] || 'treble');
+                stave.setContext(context).draw();
+                
+                // Calcular la posición de la nota en VexFlow
+                // VexFlow usa un sistema diferente: cada línea/espacio es un step
+                // F5 es la línea superior del pentagrama (posición relativa 4 en VexFlow desde la línea inferior)
+                // Necesitamos mapear nuestra posición diatónica al sistema de VexFlow
+                
+                // Mapeo: E4 = línea inferior (position 1 en nuestro sistema)
+                // En VexFlow, la línea inferior (E4) tiene key/position "e/4"
+                // Cada paso hacia arriba es un step más alto
+                
+                const vexKeys = {
+                    'C0': 'c/0',
+                    'D0': 'd/0',
+                    'E0': 'e/0',
+                    'F0': 'f/0',
+                    'G0': 'g/0',
+                    'A0': 'a/0',
+                    'B0': 'b/0',
+                    'C1': 'c/1',
+                    'D1': 'd/1',
+                    'E1': 'e/1',
+                    'F1': 'f/1',
+                    'G1': 'g/1',
+                    'A1': 'a/1',
+                    'B1': 'b/1',
+                    'C2': 'c/2',
+                    'D2': 'd/2',
+                    'E2': 'e/2',
+                    'F2': 'f/2',
+                    'G2': 'g/2',
+                    'A2': 'a/2',
+                    'B2': 'b/2',
+                    'C3': 'c/3',
+                    'D3': 'd/3',
+                    'E3': 'e/3',
+                    'F3': 'f/3',
+                    'G3': 'g/3',
+                    'A3': 'a/3',
+                    'B3': 'b/3',
+                    'C4': 'c/4',
+                    'D4': 'd/4',
+                    'E4': 'e/4',
+                    'F4': 'f/4',
+                    'G4': 'g/4',
+                    'A4': 'a/4',
+                    'B4': 'b/4',
+                    'C5': 'c/5',
+                    'D5': 'd/5',
+                    'E5': 'e/5',
+                    'F5': 'f/5',
+                    'G5': 'g/5',
+                    'A5': 'a/5',
+                    'B5': 'b/5',
+                    'C6': 'c/6'
+                };
+                
+                const staveNote = new Vex.Flow.StaveNote({
+                    keys: [vexKeys[note.id]],
+                    duration: 'q',
+                    auto_stem: true
+                });
+                
+                // VexFlow dibuja automáticamente las líneas adicionales necesarias
+                const voice = new Vex.Flow.Voice({ num_beats: 1, beat_value: 4 });
+                voice.addTickables([staveNote]);
+                
+                new Vex.Flow.Formatter().joinVoices([voice]).format([voice], staffDiv.clientWidth - 100);
+                voice.draw(context, stave);
+                
+            } catch (error) {
+                console.error('Error rendering with VexFlow:', error);
+                renderWithSVG(note);
+            }
+        }
+
+        /**
+         * Renderiza usando SVG puro (fallback)
+         */
+        function renderWithSVG(note) {
+            const staffDiv = document.getElementById('staff');
+            staffDiv.innerHTML = '';
+            
+            const width = staffDiv.clientWidth || 600;
+            const height = 200;
+            const staffY = 80;
+            const lineSpacing = 10;
+            const staffCenter = width / 2;
+            
+            // Crear SVG
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', width);
+            svg.setAttribute('height', height);
+            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            
+            // Dibujar las 5 líneas del pentagrama
+            for (let i = 0; i < 5; i++) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', 50);
+                line.setAttribute('y1', staffY + i * lineSpacing);
+                line.setAttribute('x2', width - 50);
+                line.setAttribute('y2', staffY + i * lineSpacing);
+                line.setAttribute('stroke', '#000');
+                line.setAttribute('stroke-width', '1');
+                svg.appendChild(line);
+            }
+            
+            // Dibujar la clave según la selección
+            const clefText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            clefText.setAttribute('x', 60);
+            clefText.setAttribute('y', staffY + 35);
+            clefText.setAttribute('font-size', '40');
+            clefText.setAttribute('font-family', 'serif');
+            
+            const clefSymbols = {
+                'treble': '𝄞',
+                'bass': '𝄢',
+                'alto': '𝄡',
+                'tenor': '𝄡'
+            };
+            clefText.textContent = clefSymbols[state.clef] || '𝄞';
+            svg.appendChild(clefText);
+            
+            // Calcular posición vertical de la nota según la clave
+            // La línea inferior del pentagrama (staffY + 4 * lineSpacing) es la línea 1
+            // Cada paso hacia arriba es lineSpacing/2
+            // Para clave de sol: E4 está en la línea inferior (posición -1)
+            // Para clave de fa (4ª línea): G2 está en la 3ra línea desde abajo (staffY + 2 * lineSpacing, posición -13)
+            // Para clave de fa (3ª línea): Bb1 está en la 3ra línea desde abajo (staffY + 2 * lineSpacing, posición -15)
+            
+            let referenceY, referencePosition;
+            
+            switch (state.clef) {
+                case 'bass':
+                    referenceY = staffY + 2 * lineSpacing; // G2 en 3ra línea
+                    referencePosition = -13;
+                    break;
+                case 'bass-3':
+                    referenceY = staffY + 2 * lineSpacing; // Bb1 en 3ra línea
+                    referencePosition = -15;
+                    break;
+                case 'soprano':
+                    referenceY = staffY + 0 * lineSpacing; // C4 en 1ra línea
+                    referencePosition = -3;
+                    break;
+                case 'mezzo-soprano':
+                    referenceY = staffY + 1 * lineSpacing; // C4 en 2da línea
+                    referencePosition = -3;
+                    break;
+                case 'alto':
+                    referenceY = staffY + 2 * lineSpacing; // C4 en 3ra línea
+                    referencePosition = -3;
+                    break;
+                case 'tenor':
+                    referenceY = staffY + 3 * lineSpacing; // C4 en 4ta línea
+                    referencePosition = -3;
+                    break;
+                case 'treble':
+                default:
+                    referenceY = staffY + 4 * lineSpacing; // E4 en 5ta línea
+                    referencePosition = -1;
+                    break;
+            }
+            
+            const noteY = referenceY - (note.position - referencePosition) * (lineSpacing / 2);
+            
+            // Dibujar líneas adicionales si es necesario
+            const baseTop = staffY;
+            const baseBottom = staffY + 4 * lineSpacing;
+            
+            // Líneas adicionales superiores
+            if (noteY < baseTop) {
+                let currentY = baseTop - lineSpacing;
+                while (currentY >= noteY) {
+                    const ledgerLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    ledgerLine.setAttribute('x1', staffCenter - 25);
+                    ledgerLine.setAttribute('y1', currentY);
+                    ledgerLine.setAttribute('x2', staffCenter + 25);
+                    ledgerLine.setAttribute('y2', currentY);
+                    ledgerLine.setAttribute('stroke', '#000');
+                    ledgerLine.setAttribute('stroke-width', '1');
+                    svg.appendChild(ledgerLine);
+                    currentY -= lineSpacing;
+                }
+            }
+            
+            // Líneas adicionales inferiores
+            if (noteY > baseBottom) {
+                let currentY = baseBottom + lineSpacing;
+                while (currentY <= noteY) {
+                    const ledgerLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    ledgerLine.setAttribute('x1', staffCenter - 25);
+                    ledgerLine.setAttribute('y1', currentY);
+                    ledgerLine.setAttribute('x2', staffCenter + 25);
+                    ledgerLine.setAttribute('y2', currentY);
+                    ledgerLine.setAttribute('stroke', '#000');
+                    ledgerLine.setAttribute('stroke-width', '1');
+                    svg.appendChild(ledgerLine);
+                    currentY += lineSpacing;
+                }
+            }
+            
+            // Dibujar la cabeza de la nota (óvalo)
+            const noteHead = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+            noteHead.setAttribute('cx', staffCenter);
+            noteHead.setAttribute('cy', noteY);
+            noteHead.setAttribute('rx', 8);
+            noteHead.setAttribute('ry', 6);
+            noteHead.setAttribute('fill', '#000');
+            noteHead.setAttribute('transform', `rotate(-20, ${staffCenter}, ${noteY})`);
+            svg.appendChild(noteHead);
+            
+            // Dibujar la plica (stem) hacia arriba si la nota está en la mitad inferior, hacia abajo si está en la mitad superior
+            const stem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            const stemDirection = noteY > staffY + 2 * lineSpacing ? -1 : 1;
+            const stemStart = staffCenter + (stemDirection === 1 ? 8 : -8);
+            const stemEnd = staffCenter + (stemDirection === 1 ? 8 : -8);
+            const stemYStart = noteY;
+            const stemYEnd = noteY + (stemDirection * 35);
+            
+            stem.setAttribute('x1', stemStart);
+            stem.setAttribute('y1', stemYStart);
+            stem.setAttribute('x2', stemEnd);
+            stem.setAttribute('y2', stemYEnd);
+            stem.setAttribute('stroke', '#000');
+            stem.setAttribute('stroke-width', '1.5');
+            svg.appendChild(stem);
+            
+            staffDiv.appendChild(svg);
+        }
+
+        // ============================================
+        // FUNCIONES DE INTERFAZ
+        // ============================================
+
+        function updateFeedback(type, message) {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback ' + type;
+            if (message) {
+                feedback.textContent = message;
+            } else if (type === 'neutral') {
+                feedback.textContent = translations[currentLanguage]['press-key'];
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('correct-count').textContent = state.correctAnswers;
+            document.getElementById('wrong-count').textContent = state.wrongAnswers;
+            
+            const total = state.correctAnswers + state.wrongAnswers;
+            const percentage = total > 0 ? Math.round((state.correctAnswers / total) * 100) : 0;
+            document.getElementById('percentage').textContent = percentage + '%';
+            document.getElementById('streak').textContent = state.streak;
+        }
+
+        function updateNoteButtons() {
+            const container = document.getElementById('note-buttons');
+            container.innerHTML = '';
+            
+            const activeNotes = getActiveNotes();
+            
+            // Ordenar por posición diatónica (secuencia continua)
+            const sortedNotes = [...activeNotes].sort((a, b) => a.position - b.position);
+            
+            if (state.consolidateNotes) {
+                // Consolidar notas por nombre (solo un botón por nombre de nota)
+                const noteGroups = {};
+                sortedNotes.forEach(note => {
+                    if (!noteGroups[note.name]) {
+                        noteGroups[note.name] = [];
+                    }
+                    noteGroups[note.name].push(note);
+                });
+                
+                // Crear botones consolidados
+                Object.keys(noteGroups).sort((a, b) => {
+                    const scaleOrder = { 'Do': 0, 'Re': 1, 'Mi': 2, 'Fa': 3, 'Sol': 4, 'La': 5, 'Si': 6 };
+                    return scaleOrder[a] - scaleOrder[b];
+                }).forEach(noteName => {
+                    const notesInGroup = noteGroups[noteName];
+                    const button = document.createElement('button');
+                    button.className = 'note-button';
+                    button.textContent = noteName;
+                    // Al hacer clic, verificar si coincide con el nombre de la nota actual
+                    button.onclick = () => {
+                        if (state.currentNote && state.currentNote.name === noteName) {
+                            handleAnswer(state.currentNote.id);
+                        }
+                    };
+                    container.appendChild(button);
+                });
+            } else {
+                // Mostrar todas las notas individualmente
+                sortedNotes.forEach(note => {
+                    const button = document.createElement('button');
+                    button.className = 'note-button';
+                    button.textContent = note.displayName;
+                    button.onclick = () => handleAnswer(note.id);
+                    container.appendChild(button);
+                });
+            }
+        }
+
+        // ============================================
+        // SISTEMA DE SONIDO
+        // ============================================
+
+        function playSound(type) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                if (type === 'correct') {
+                    // Sonido agudo y alegre para acierto
+                    oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5
+                    oscillator.frequency.exponentialRampToValueAtTime(1760, audioContext.currentTime + 0.1); // A6
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                } else if (type === 'wrong') {
+                    // Sonido grave y descendente para error
+                    oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                }
+            } catch (error) {
+                console.error('Error playing sound:', error);
+            }
+        }
+
+        // ============================================
+        // MANEJO DE RESPUESTAS
+        // ============================================
+
+        function handleAnswer(answerId) {
+            if (state.isProcessingAnswer || !state.currentNote) return;
+            
+            state.isProcessingAnswer = true;
+            
+            if (answerId === state.currentNote.id) {
+                // Respuesta correcta
+                state.correctAnswers++;
+                state.streak++;
+                updateStats();
+                updateFeedback('correct', translations[currentLanguage]['correct-feedback']);
+                playSound('correct');
+                
+                setTimeout(() => {
+                    generateNextNote();
+                    state.isProcessingAnswer = false;
+                }, 250);
+            } else {
+                // Respuesta incorrecta
+                state.wrongAnswers++;
+                state.streak = 0;
+                updateStats();
+                updateFeedback('incorrect', `${translations[currentLanguage]['wrong-feedback']} ${state.currentNote.displayName}`);
+                playSound('wrong');
+                
+                setTimeout(() => {
+                    generateNextNote();
+                    state.isProcessingAnswer = false;
+                }, 600);
+            }
+        }
+
+        // ============================================
+        // MANEJO DEL TECLADO
+        // ============================================
+
+        function handleKeyboardInput(event) {
+            // Ignorar teclas repetidas
+            if (event.repeat) return;
+            
+            // Ignorar teclas de control durante el juego
+            if (['Escape', 'Enter', 'Tab'].includes(event.key)) return;
+            
+            // Si estamos configurando una tecla, manejarla en el sistema de configuración
+            if (state.isConfiguringKey) {
+                handleKeyAssignment(event);
+                return;
+            }
+            
+            // Normalizar la tecla
+            const key = event.key.toLowerCase();
+            
+            if (state.consolidateNotes) {
+                // Modo consolidado: buscar tecla por nombre de nota
+                const noteName = Object.keys(state.keyMap).find(id => state.keyMap[id] === key);
+                if (noteName && state.currentNote) {
+                    const note = NOTES.find(n => n.id === noteName);
+                    if (note && note.name === state.currentNote.name) {
+                        handleAnswer(state.currentNote.id);
+                    }
+                }
+            } else {
+                // Modo normal: buscar tecla por ID específico
+                const noteId = Object.keys(state.keyMap).find(id => state.keyMap[id] === key);
+                if (noteId) {
+                    handleAnswer(noteId);
+                }
+            }
+        }
+
+        // ============================================
+        // CONFIGURACIÓN DE TECLAS
+        // ============================================
+
+        function openKeyConfig() {
+            const modal = document.getElementById('key-config-modal');
+            modal.classList.add('active');
+            updateKeyAssignmentList();
+        }
+
+        function closeKeyConfig() {
+            const modal = document.getElementById('key-config-modal');
+            modal.classList.remove('active');
+            state.isConfiguringKey = false;
+            state.configuringNoteId = null;
+            updateKeyAssignmentList();
+        }
+
+        function updateKeyAssignmentList() {
+            const list = document.getElementById('key-assignment-list');
+            list.innerHTML = '';
+            
+            const activeNotes = getActiveNotes();
+            
+            // Ordenar por posición diatónica (secuencia continua)
+            const sortedNotes = [...activeNotes].sort((a, b) => a.position - b.position);
+            
+            if (state.consolidateNotes) {
+                // Modo consolidado: agrupar por nombre de nota
+                const noteGroups = {};
+                sortedNotes.forEach(note => {
+                    if (!noteGroups[note.name]) {
+                        noteGroups[note.name] = [];
+                    }
+                    noteGroups[note.name].push(note);
+                });
+                
+                Object.keys(noteGroups).sort((a, b) => {
+                    const scaleOrder = { 'Do': 0, 'Re': 1, 'Mi': 2, 'Fa': 3, 'Sol': 4, 'La': 5, 'Si': 6 };
+                    return scaleOrder[a] - scaleOrder[b];
+                }).forEach(noteName => {
+                    const notesInGroup = noteGroups[noteName];
+                    const item = document.createElement('div');
+                    item.className = 'key-assignment-item';
+                    if (state.configuringNoteId === noteName) {
+                        item.classList.add('listening');
+                    }
+                    
+                    const key = state.keyMap[noteName];
+                    const keyDisplay = key ? key.toUpperCase() : 'Sin asignar';
+                    
+                    item.innerHTML = `
+                        <span class="note-name">${noteName}</span>
+                        <span class="key-name ${!key ? 'unassigned' : ''}">${keyDisplay}</span>
+                    `;
+                    
+                    item.onclick = () => startKeyAssignment(noteName);
+                    list.appendChild(item);
+                });
+            } else {
+                // Modo normal: mostrar todas las notas
+                sortedNotes.forEach(note => {
+                    const item = document.createElement('div');
+                    item.className = 'key-assignment-item';
+                    if (state.configuringNoteId === note.id) {
+                        item.classList.add('listening');
+                    }
+                    
+                    const key = state.keyMap[note.id];
+                    const keyDisplay = key ? key.toUpperCase() : 'Sin asignar';
+                    
+                    item.innerHTML = `
+                        <span class="note-name">${note.displayName}</span>
+                        <span class="key-name ${!key ? 'unassigned' : ''}">${keyDisplay}</span>
+                    `;
+                    
+                    item.onclick = () => startKeyAssignment(note.id);
+                    list.appendChild(item);
+                });
+            }
+        }
+
+        function startKeyAssignment(noteIdentifier) {
+            state.isConfiguringKey = true;
+            state.configuringNoteId = noteIdentifier;
+            updateKeyAssignmentList();
+        }
+
+        function handleKeyAssignment(event) {
+            const key = event.key.toLowerCase();
+            
+            // Ignorar teclas de control
+            if (['Escape', 'Enter', 'Tab'].includes(event.key)) return;
+            
+            // Ignorar teclas modificadoras solas
+            if (['Control', 'Alt', 'Shift', 'Meta'].includes(event.key)) return;
+            
+            state.pendingKey = key;
+            
+            // Verificar si la tecla ya está asignada a otra nota
+            const existingNoteId = Object.keys(state.keyMap).find(id => 
+                state.keyMap[id] === key && id !== state.configuringNoteId
+            );
+            
+            if (existingNoteId) {
+                state.conflictNoteId = existingNoteId;
+                showConflictModal();
+            } else {
+                // Asignar directamente
+                state.keyMap[state.configuringNoteId] = key;
+                saveKeyMap();
+                state.isConfiguringKey = false;
+                state.configuringNoteId = null;
+                updateKeyAssignmentList();
+            }
+        }
+
+        function showConflictModal() {
+            const conflictNote = NOTES.find(n => n.id === state.conflictNoteId);
+            const configuringNote = NOTES.find(n => n.id === state.configuringNoteId);
+            
+            const message = document.getElementById('conflict-message');
+            const keyConflictText = currentLanguage === 'es' 
+                ? `La tecla ${state.pendingKey.toUpperCase()} ya está asignada a ${conflictNote.displayName}. ¿Quieres intercambiar las teclas?`
+                : `The key ${state.pendingKey.toUpperCase()} is already assigned to ${conflictNote.displayName}. Do you want to swap the keys?`;
+            message.textContent = keyConflictText;
+            
+            document.getElementById('conflict-modal').classList.add('active');
+        }
+
+        function closeConflictModal() {
+            document.getElementById('conflict-modal').classList.remove('active');
+            state.pendingKey = null;
+            state.conflictNoteId = null;
+        }
+
+        function confirmSwap() {
+            // Intercambiar las teclas
+            const tempKey = state.keyMap[state.conflictNoteId];
+            state.keyMap[state.conflictNoteId] = state.keyMap[state.configuringNoteId];
+            state.keyMap[state.configuringNoteId] = state.pendingKey;
+            
+            saveKeyMap();
+            closeConflictModal();
+            
+            state.isConfiguringKey = false;
+            state.configuringNoteId = null;
+            updateKeyAssignmentList();
+        }
+
+        function cancelSwap() {
+            closeConflictModal();
+            state.isConfiguringKey = false;
+            state.configuringNoteId = null;
+            updateKeyAssignmentList();
+        }
+
+        function restoreDefaultKeyMap() {
+            // Restaurar solo las asignaciones por defecto
+            state.keyMap = { ...DEFAULT_KEY_MAP };
+            saveKeyMap();
+            updateKeyAssignmentList();
+        }
+
+        // ============================================
+        // PERSISTENCIA EN localStorage
+        // ============================================
+
+        const STORAGE_KEY = 'musicNoteTrainerKeyMap';
+
+        function loadKeyMap() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    // Validar que sea un objeto
+                    if (typeof parsed === 'object' && parsed !== null) {
+                        state.keyMap = parsed;
+                    } else {
+                        state.keyMap = state.consolidateNotes ? { ...DEFAULT_CONSOLIDATED_KEY_MAP } : { ...DEFAULT_KEY_MAP };
+                    }
+                } else {
+                    state.keyMap = state.consolidateNotes ? { ...DEFAULT_CONSOLIDATED_KEY_MAP } : { ...DEFAULT_KEY_MAP };
+                }
+            } catch (error) {
+                console.error('Error loading key map:', error);
+                state.keyMap = state.consolidateNotes ? { ...DEFAULT_CONSOLIDATED_KEY_MAP } : { ...DEFAULT_KEY_MAP };
+            }
+        }
+
+        function saveKeyMap() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state.keyMap));
+            } catch (error) {
+                console.error('Error saving key map:', error);
+            }
+        }
+
+        // ============================================
+        // REINICIAR SESIÓN
+        // ============================================
+
+        function resetSession() {
+            state.correctAnswers = 0;
+            state.wrongAnswers = 0;
+            state.streak = 0;
+            state.currentNote = null;
+            state.previousNote = null;
+            state.isProcessingAnswer = false;
+            
+            updateStats();
+            updateFeedback('neutral', 'Pulsa una tecla o botón para comenzar');
+            generateNextNote();
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cargar idioma guardado
+            const savedLanguage = localStorage.getItem('speedNotesLanguage');
+            if (savedLanguage) {
+                currentLanguage = savedLanguage;
+                document.getElementById('language-select').value = savedLanguage;
+                setLanguage(savedLanguage);
+            }
+
+            // Cargar tema guardado
+            const savedTheme = localStorage.getItem('speedNotesTheme');
+            if (savedTheme) {
+                document.body.className = 'theme-' + savedTheme;
+                document.getElementById('gradient-select').value = savedTheme;
+            }
+
+            // Cargar configuración de teclas
+            loadKeyMap();
+            
+            // Configurar controles
+            document.getElementById('clef-select').addEventListener('change', (e) => {
+                state.clef = e.target.value;
+                generateNextNote();
+            });
+            
+            document.getElementById('mode-select').addEventListener('change', (e) => {
+                state.mode = e.target.value;
+                generateNextNote();
+            });
+            
+            document.getElementById('consolidate-notes').addEventListener('change', (e) => {
+                state.consolidateNotes = e.target.checked;
+                // Recargar el mapeo de teclas según el modo
+                state.keyMap = state.consolidateNotes ? { ...DEFAULT_CONSOLIDATED_KEY_MAP } : { ...DEFAULT_KEY_MAP };
+                saveKeyMap();
+                updateNoteButtons();
+            });
+
+            document.getElementById('gradient-select').addEventListener('change', (e) => {
+                const theme = e.target.value;
+                document.body.className = 'theme-' + theme;
+                localStorage.setItem('speedNotesTheme', theme);
+            });
+
+            document.getElementById('language-select').addEventListener('change', (e) => {
+                setLanguage(e.target.value);
+            });
+            
+            document.getElementById('upper-ledger').addEventListener('change', (e) => {
+                state.upperLedgerLines = parseInt(e.target.value);
+                generateNextNote();
+            });
+            
+            document.getElementById('lower-ledger').addEventListener('change', (e) => {
+                state.lowerLedgerLines = parseInt(e.target.value);
+                generateNextNote();
+            });
+            
+            // Botones de acción
+            document.getElementById('config-keys-btn').addEventListener('click', openKeyConfig);
+            document.getElementById('reset-btn').addEventListener('click', resetSession);
+            
+            // Modal de configuración
+            document.getElementById('close-modal').addEventListener('click', closeKeyConfig);
+            document.getElementById('close-modal-btn').addEventListener('click', closeKeyConfig);
+            document.getElementById('restore-defaults').addEventListener('click', restoreDefaultKeyMap);
+            
+            // Modal de conflicto
+            document.getElementById('confirm-swap').addEventListener('click', confirmSwap);
+            document.getElementById('cancel-conflict').addEventListener('click', cancelSwap);
+            
+            // Cerrar modales al hacer clic fuera
+            document.getElementById('key-config-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'key-config-modal') {
+                    closeKeyConfig();
+                }
+            });
+            
+            document.getElementById('conflict-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'conflict-modal') {
+                    cancelSwap();
+                }
+            });
+            
+            // Evento de teclado global
+            document.addEventListener('keydown', handleKeyboardInput);
+            
+            // Inicializar
+            generateNextNote();
+            updateNoteButtons();
+            updateStats();
+        });
+    </script>
+</body>
+</html>
