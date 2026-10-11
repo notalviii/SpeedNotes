@@ -2,7 +2,11 @@
 
 ## Description
 
+<<<<<<< HEAD
 SpeedNotes is an interactive web application designed to help musicians and music students improve their sight-reading skills. It displays musical notes on a staff and challenges users to identify them quickly using keyboard shortcuts or touch buttons. It supports english and spanish languages.
+=======
+SpeedNotes is an interactive web application designed to help musicians and music students improve their sight-reading skills. It displays musical notes on a staff and challenges users to identify them quickly using keyboard shortcuts or touch buttons. (It supportes English and Spanish languages)
+>>>>>>> d19afb50c32faf21362f6f6e7d7d36d4897ac8ed
 
 ## Features
 
@@ -41,7 +45,11 @@ SpeedNotes is an interactive web application designed to help musicians and musi
 
 ## Credits
 
+<<<<<<< HEAD
 **Created by**: not_alviii 🧸 and Devin
+=======
+**Created by**: not_alviii 🧸, and "Devin"
+>>>>>>> d19afb50c32faf21362f6f6e7d7d36d4897ac8ed
 
 ## License
 
