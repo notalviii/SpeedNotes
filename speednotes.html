@@ -1244,24 +1244,31 @@
                     button.className = 'note-button';
                     button.textContent = noteName;
                     // Al hacer clic, verificar si coincide con el nombre de la nota actual
-                    button.onclick = () => {
-                        if (state.currentNote && state.currentNote.name === noteName) {
-                            handleAnswer(state.currentNote.id);
-                        }
-                    };
-                    container.appendChild(button);
-                });
-            } else {
-                // Mostrar todas las notas individualmente
-                sortedNotes.forEach(note => {
-                    const button = document.createElement('button');
-                    button.className = 'note-button';
-                    button.textContent = note.displayName;
-                    button.onclick = () => handleAnswer(note.id);
-                    container.appendChild(button);
-                });
-            }
-        }
+                    
+
+button.onclick = () => {
+    if (state.currentNote) {
+        handleAnswer(
+            state.currentNote.name === noteName
+                ? state.currentNote.id
+                : null
+        );
+    }
+};
+container.appendChild(button);
+});
+} else {
+    // Mostrar todas las notas individualmente
+    sortedNotes.forEach(note => {
+        const button = document.createElement('button');
+        button.className = 'note-button';
+        button.textContent = note.displayName;
+        button.onclick = () => handleAnswer(note.id);
+        container.appendChild(button);
+    });
+}
+}
+
 
         // ============================================
         // SISTEMA DE SONIDO

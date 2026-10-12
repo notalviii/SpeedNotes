@@ -1,10 +1,12 @@
-# SpeedNotes v1.0.0
+# SpeedNotes v1.0.1
+
+## v1.0.1 
+
+- **bug fix**: In the mode of **consolidate notes** ,before you can't fail. Now if you insert a note that doesn't match with the correct note in the **stave**, the `program`says to you that is incorrect.
 
 ## Description
 
-SpeedNotes is an interactive web application designed to help musicians and music students improve their sight-reading skills. It displays musical notes on a staff and challenges users to identify them quickly using keyboard shortcuts or touch buttons. It supports english and spanish languages.
-=======
-SpeedNotes is an interactive web application designed to help musicians and music students improve their sight-reading skills. It displays musical notes on a staff and challenges users to identify them quickly using keyboard shortcuts or touch buttons. (It supportes English and Spanish languages)
+- SpeedNotes is an interactive web application designed to help musicians and music students improve their sight-reading skills. It displays musical notes on a staff and challenges users to identify them quickly using keyboard shortcuts or touch buttons. (It supportes English and Spanish languages)
 
 ## Features
 
@@ -43,10 +45,7 @@ SpeedNotes is an interactive web application designed to help musicians and musi
 
 ## Credits
 
-**Created by**: not_alviii 🧸 and Devin
-=======
 **Created by**: not_alviii 🧸, and "Devin"
-
 
 ## License
 
