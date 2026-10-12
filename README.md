@@ -2,7 +2,7 @@
 
 ## v1.0.1 
 
-- **bug fix**: In the mode of **consolidate notes** ,before you can't fail. Now if you insert a note that doesn't match with the correct note in the **stave**, the `program`says to you that is incorrect.
+- **bug fix**: In the mode of **consolidate notes** ,before you can't fail. Now if you insert a note that doesn't match with the correct note in the **stave**, the program says to you that is incorrect.
 
 ## Description
 
