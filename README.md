@@ -4,6 +4,10 @@
 
 - **bug fix**: In the mode of **consolidate notes** ,before you can't fail. Now if you insert a note that doesn't match with the correct note in the **stave**, the program says to you that is incorrect.
 
+## Installation
+
+- In releases there's a html. file, that you are be able to run it. 
+
 ## Description
 
 - SpeedNotes is an interactive web application designed to help musicians and music students improve their sight-reading skills. It displays musical notes on a staff and challenges users to identify them quickly using keyboard shortcuts or touch buttons. (It supportes English and Spanish languages)
